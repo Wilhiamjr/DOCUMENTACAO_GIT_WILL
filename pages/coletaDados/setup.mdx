@@ -1,0 +1,86 @@
+
+import Image from 'next/image'
+
+# O hardware
+O processo de coleta de dados teve como objetivo gravar varias pessoas lavando as mãos com um conjunto específico de gestos. 
+Para serem estatisticamente significativos, os dados devem incluir a variabilidade de ambas as características das pessoas, como altura, sexo, experiência médica, mas também características ambientais, incluindo iluminação local e intensidade de luz.
+Para garantir essa variabilidade, o ponto de coleta foi escolhido como um carrinho móvel sobre rodas, facilmente transportável de um lugar para outro. Em seu princípio o carrinho poderia ser composto por componentes simples, que incluem:
+<br/>
+
+- [x] base com rodas proporcionando estabilidade e rigidez
+- [x] poste longo fixado na base para ajuste de altura da câmera
+- [x] braçadeiras, braços e bandejas metálicas para montagem de componentes
+
+<br/>
+
+<Image src="/coletaDados/elementos.png" alt="Elementos" width={700} height={500} />
+
+<br/>
+Após a montagem, o carrinho móvel seria equipado com os seguintes componentes:
+<br/>
+
+- [x] câmera de profundidade RealSense D435i
+- [x] mini PC rodando com sistema operacional Linux
+- [x] dispensador
+- [x] bandeja imitando uma pia
+
+O sistema móvel de coleta de dados deveria ter a aparência como no imagem abaixo
+<br/>
+
+<Image src="/coletaDados/elementos_armados.png" alt="Elementos armados" width={700} height={500} />
+
+Neste ponto decidiu-se que a câmera seria montada a 180 cm do chão e a 20 cm da parede olhando para a bandeja(montada a meia distância entre o chão e a câmera) e tendo pelo menos uma visão parcial do dispensador.
+
+# O software
+O software utilizado para coletar os dados foi originalmente desenvolvido pela Intel e se chamava RealSense Viewer (versão Linux instalada no miniPC). A interface RealSense tem uma visão da câmera e permitir carregar manualmente vários parâmetros para sua configuração. A gravação foi salva no chamado arquivo ".bag" contendo quadros dos modos profundidade, RGB e infravermelho.
+
+<Image src="/coletaDados/software_coleta.png" alt="Software coleta" width={700} height={500} />
+
+Como este software pode parecer complicado de usar para um usuário inexperiente (enfermeira de hospital, por exemplo), desenvolvemos um código Intel SDK simples executado por um script BASH colocado em uma estrutura de pasta de coleta de dados (a estrutura completa da pasta é mostrada na seção *Dados Coletados*). O código carregaria automaticamente o conjunto de parâmetros da câmera e iniciaria a gravação. 
+
+### BASH script 
+(executado por enfermeira com duplo clique do mouse)
+
+~~~python
+#! /bin/bash
+BASEDIR=$(pwd)
+SCRIPTDIR='/tmp/aux_coleta/gravar.py'
+ROIDIR='/tmp/aux_coleta/'
+python3 "${SCRIPTDIR}" "${ROIDIR}" "${BASEDIR}"
+~~~
+
+### SDK pyrealsense script 
+(chamado automaticamente pelo script BASH)
+
+~~~python
+...
+# Create a pipeline
+pipeline = rs.pipeline()
+
+# Create a config and configure the pipeline to stream
+#  different resolutions of color and depth streams
+config = rs.config()
+
+# Load resolution and frame rate parameters
+config.enable_stream(rs.stream.depth, 848, 480, rs.format.z16, 15)
+config.enable_stream(rs.stream.color, 848, 480, rs.format.bgr8, 15)
+config.enable_record_to_file(str('.bag_')+str(time_now)+'_'+'.bag')
+
+# Start streaming
+profile = pipeline.start(config)
+
+# Getting the depth sensor's depth scale (see rs-align example for explanation)
+depth_sensor = profile.get_device().first_depth_sensor()
+depth_scale = depth_sensor.get_depth_scale()
+depth_sensor.set_option(rs.option.visual_preset, 2)
+...
+
+~~~
+
+Dessa forma, uma enfermeira poderia gravar os gestos com um simples clique duplo do mouse, salvando todos os imagens na pasta certa, sem se preocupar com uma visualização complexa da interface origial do Intel. Para facilitar ainda mais a coleta de dados, uma tela montada no poste mostraria a posição real das mãos e braços do voluntário facilitando o ajuste de sua posição em relação à câmera.
+
+<br/>
+
+<Image src="/coletaDados/coleta_screen.png" alt="Software coleta" width={400} height={500} />
+
+A tela mostra quadros coloridos visualizados durante a coleta. O vermelho (crop pequeno) indica ao voluntário a posição das mãos enquanto realiza todos os gestos pertencentes ao procedimento de lavagem das palmas de maos. O verde (crop grande) indica ao voluntário a posição dos braços enquanto realiza todos os gestos pertencentes ao procedimento de lavagem dos braços. O cronômetro no canto inferior direito da tela mostra o horário da gravação.

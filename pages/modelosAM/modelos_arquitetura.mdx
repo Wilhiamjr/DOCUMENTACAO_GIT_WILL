@@ -1,0 +1,71 @@
+---
+title: Modelos, Arquitetura, Mediapipe
+---
+
+## Segmentação
+
+No desenvolvimento do projeto, foi necessário integrar a câmera Intel RealSense 435i ao sistema, e por isso, aproveitou-se sua capacidade única de capturar tanto imagens RGB quanto dados de profundidade em tempo real. Desta maneira, foi possível desenvolver um modelo de segmentação utilizando as informações da própria câmera. Uma vez que os dados foram capturados, esforços foram concentrados na etapa crítica de pós-processamento para garantir a precisão e confiabilidade dos resultados. Isso incluiu a aplicação de algoritmos para corrigir distorções e aprimorar a qualidade dos dados de profundidade, minimizando ruídos e compensando erros de calibração. 
+
+Com base nas funcionalidades oferecidas pela câmera e pela Intel RealSense SDK, uma variedade de técnicas de pós-processamento foi utilizada, como alinhamento de imagem, filtro de suavização, filtro de confiança, filtro temporal e preenchimento de buracos. Como exemplo, a função apresentada a seguir realiza o alinhamento de imagem e retorna as imagens colorida e de profundidade:
+
+~~~python
+def capture(self):
+    try:
+        frames = self.pipe.wait_for_frames()
+    except Exception as e:
+        print(e)
+        exit()
+
+    # Align the depth frame to color frame
+    aligned_frames = self.align.process(frames)
+    if aligned_frames is not None:
+        color_frame = aligned_frames.get_color_frame()
+        depth_frame = aligned_frames.get_depth_frame()	
+
+        color_image = np.asanyarray(color_frame.get_data())
+        depth_image = np.asanyarray(depth_frame.get_data())
+
+        ret = True 
+    return ret, color_image, depth_image
+
+~~~
+
+Essas técnicas foram essenciais para melhorar a coesão, suavidade e precisão dos dados de profundidade, criando uma representação mais completa da cena tridimensional. Foi explorada a vantagem de utilizar a imagem de profundidade gerada pela câmera, que fornece informações precisas sobre as distâncias dos objetos no ambiente. Essa informação foi especialmente útil ao alinhar características específicas do projeto, como a posição das mãos em alturas relativamente fixas. Essa consistência na altura das mãos permitiu segmentar de maneira confiável as mãos e os braços na cena, contribuindo para a precisão e confiabilidade do processo de segmentação. Esta abordagem aproveitou as características intrínsecas do contexto do projeto para melhorar a eficácia da segmentação e, consequentemente, a performance do modelo de classificação. 
+
+O processo de segmentação, embora não perfeito e passível de aprimoramentos, tem se mostrado adequado, visto que sua principal função é servir de suporte ao modelo de classificação. Como a performance do modelo de classificação utilizando as imagens segmentadas é avaliada continuamente, se necessário, algoritmos mais avançados de segmentação e pós-processamento dos dados poderão ser implementados, visando melhorar ainda mais a precisão e confiabilidade das análises realizadas pelo sistema. 
+
+## Classificação 
+
+Os processos de treinamento dos modelos de classificação normalmente envolvem a divisão de forma aleatória dos conjuntos de dados em treino e teste, ou ainda em treino, validação e teste. Um exemplo é a separação em 70\% dos dados para treino, 20\% para validação e 10\% para teste. 
+
+Como forma de garantir a diversidade de casos nos conjuntos de dados e não enviesar o treinamento ou a avaliação dos modelos, no presente trabalho foi utilizada a abordagem de divisão do conjunto de dados em treino, validação e teste. Primeiramente, como os dados das 74 pessoas foram coletados em 17 dias diferentes, separou-se uma amostra de 17 pessoas (23\% do total), sendo 1 pessoa de cada dia[^1] para o conjunto de testes. Ou seja, são dados de pessoas diferentes, que os modelos nunca viram durante as fases de treinamento e validação (com as características particulares de cada pessoa, como diferentes tamanhos de mão, cor de pele, altura, entre outras), que são apresentadas ao modelo apenas na fase de testes. O conjunto de dados remanescente (57 pessoas, o que equivale a 77% do total) foi então dividido em dados de treinamento e validação, sendo considerados 80\% para treinamento e 20\% para testes, resultando numa porcentagem final de 61,6\% dos dados para treinamento, 15,4\% para validação e 23\% para testes.  
+
+[^1]: Sempre a primeira pessoa de cada dia
+
+Para treinamento dos modelos foram utilizadas as seguintes ferramentas: Redes Neurais Convolucionais, Python, Keras[^2], Tensorflow [^3], MLflow para armazenamento de resultados [^4] e um servidor com 4 GPUs de 80GB de memória para processamento. Para avaliar o desempenho da IA, foram utilizadas métricas como acurácia, precisão, revocação e F1-Score.
+
+[^2]: https://keras.io/
+[^3]: https://www.tensorflow.org/
+[^4]: https://mlflow.org/
+
+Foram testadas diversas abordagens para treinamento dos modelos, diferentes modelos e diferentes hiperparâmetros. Ao final do processo, optou-se por uma abordagem que faz uso de 3 modelos diferentes, dado que esta apresentou os melhores resultados. Entretanto, vale apresentar também uma abordagem de modelo único, visto que, apesar de não ter sido escolhida para uso no software final, é similar à abordagem usada por outros grupos de pesquisa[^5] e também apresentou resultados satisfatórios (apesar de inferior à abordagem com 3 modelos).
+
+[^5]: GRECO, Antonio et al. A deep learning based system for handwashing procedure evaluation. Neural Computing and Applications, v. 35, n. 22, p. 15981-15996, 2023.
+
+Vale notar que nas abordagens finais (tanto para modelo único, como para modelos separados) foram utilizadas as técnicas de *Transfer Learning* e *Data Augmentation*. 
+
+*Transfer learning* é um conceito de aprendizado de máquina que permite que um modelo treinado em um conjunto de dados ou tarefa seja reutilizado como ponto de partida para um novo modelo em uma tarefa ou conjunto de dados relacionado, permitindo, portanto, que modelos treinados compartilhem seus conhecimentos e ajudem a melhorar os resultados. Essa abordagem é especialmente útil quando se lida com problemas onde há uma quantidade limitada de dados disponíveis, permitindo que o conhecimento adquirido em uma tarefa anterior (e.g. a partir de grandes bases de dados não médicos) auxilie no aprendizado de uma nova tarefa (e.g. para resolver um problema médico específico) [^6]. Por exemplo, em *deep learning*, é comum usar modelos pré-treinados em grandes bases de dados, como o ImageNet [^7], para tarefas de classificação de imagens. Ao utilizar transfer learning, as camadas iniciais do modelo, que capturam características gerais das imagens, são mantidas, enquanto apenas as camadas finais são ajustadas ou retrainadas para a nova tarefa específica. Isso não apenas acelera o processo de treinamento, mas também frequentemente resulta em modelos com desempenho superior, já que eles começam com uma base de conhecimento pré-estabelecida. No presente trabalho, os modelos finais foram treinados com base no modelo pré-treinado MobileNetV2 (`tf.keras.applications.MobileNetV2`), carregado com pesos pré-treinados no ImageNet[^8].
+
+[^6]: Mohammad Amin Morid, Alireza Borjali, and Guilherme Del Fiol. “A scoping review of transfer learning research on medical image analysis using ImageNet”. In: Computers in Biology and Medicine 128 (2021), p. 104115. issn: 0010-4825. doi: https://doi. org/10.1016/j.compbiomed.2020.104115. url: https://www.sciencedirect.com/science/article/pii/S0010482520304467.
+[^7]: J. Deng, W. Dong, R. Socher, L. -J. Li, Kai Li and Li Fei-Fei, "ImageNet: A large-scale hierarchical image database," 2009 IEEE Conference on Computer Vision and Pattern Recognition, Miami, FL, USA, 2009, pp. 248-255, doi: 10.1109/CVPR.2009.5206848.
+[^8]: https://www.tensorflow.org/api_docs/python/tf/keras/applications/MobileNetV2
+
+*Data Augmentation* é uma técnica amplamente utilizada no treinamento de redes neurais para aumentar a quantidade de dados de treinamento sem a necessidade de coletar novos dados. No Keras, uma biblioteca popular de deep learning, data augmentation pode ser implementada para aplicar várias transformações nas imagens em tempo real, como rotações, translações, zooms, espelhamentos e alterações de brilho, a cada imagem do conjunto de dados. Essas transformações ajudam a criar variações das imagens originais, o que melhora a robustez e a generalização do modelo, reduzindo o overfitting. As versões finais dos modelos foram treinadas com os seguintes parâmetros de data augmentation:
+
+~~~python
+data_augmentation = tf.keras.Sequential([
+tf.keras.layers.RandomRotation(0.1),
+tf.keras.layers.RandomTranslation(height_factor=0.1, width_factor=0.1),
+tf.keras.layers.RandomZoom(0.1),
+tf.keras.layers.RandomContrast(0.1)])
+~~~

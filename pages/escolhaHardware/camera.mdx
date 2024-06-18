@@ -1,0 +1,39 @@
+
+import Image from 'next/image'
+
+# Camera
+
+Antes de implementar a solução baseada em vison computacional para o sistema de monitoramento da lavagem das mãos, revisamos cuidadosamente a literatura recente a respeito do tema. Os métodos mais promissores disponíveis na literatura foram baseados nas chamadas câmeras de profundidade, que, além de mostrarem camadas RGB típicas, permitem explorar a terceira dimensão relacionada à profundidade da imagem. Além disso, o uso de uma câmera tradicional introduz várias questões relacionadas à variação nas condições de iluminação, bem como à presença do líquido. Por essa razão, decidimos usar depthcamera para o nosso sistema. Entre várias marcas e modelos de câmeras de profundidade disponíveis no mercado, escolhemos a câmera Intel RealSence D435i devido à sua boa relação preço-qualidade.
+
+<br/>
+
+<Image src="/escolhaHardware/d435i.png" alt="Elementos" width={660} height={400} />
+
+A importância da dimensão profundidade pode ser vista nas duas imagens abaixo. À esquerda, uma imagem RGB mostra uma pilha de papelões cinzas deixando um observador incapaz de distinguir o número e a forma dos elementos, enquanto e no lado direito e mapa colorido RGB mostra claramente cinco figuras de papelão.
+
+RGB             |  DEPTH |
+:-------------------------:|:-------------------------:|
+<Image src="/escolhaHardware/cardboards_RGB.png" alt="Elementos" width={300} height={300} />  |  <Image src="/escolhaHardware/cardboards_DEPTH.png" alt="Elementos" width={300} height={300} /> 
+
+Além disso, a dimensão de profundidade facilita muito a segmentação da imagem, permitindo que o usuário remova da imagem dimensões de backgrouund ou outras profundidades indesejadas. 
+<br/>
+
+<Image src="/escolhaHardware/image9.png" alt="Elementos" width={650} height={500} /> 
+
+Esse recurso é particularmente útil para classificar imagens que podem ser tiradas em diferentes ambientes e cenários hospitalares. Por exemplo, diferentes formas, cores ou dimensões do coletor podem introduzir viés no algoritmo de aprendizado de máquina.
+
+<br/>
+# CPU
+
+A câmera é controlada pelo componente mini PC NUC N11-1135 série rodando no sistema operacional Linux.
+<br/>
+
+<Image src="/escolhaHardware/image12.jpeg" alt="Elementos" width={400} height={400} />   
+<br/>
+As especificações deste modelo são as seguintes:
+
+- 11th Gen Intel® Core i5-1135G7, 0.9GHz – 4.20GHz Turbo 4-Core 8-Thread, 12-28W TDP (Formerly Tiger Lake) 
+- DDR4-3200MHz Dual Channel SO-DIMM up to 64GB
+- Intel® Iris® Xe Graphics 80EU 1.30GHz
+- 500GB SATA3 6Gb/s
+

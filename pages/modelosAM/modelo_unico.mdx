@@ -1,0 +1,41 @@
+---
+title: Abordagem de modelo único
+---
+
+# Modelo único para todos os gestos (15 classes)
+
+A abordagem de modelo único é comparável à abordagem utilizada por outros grupos de pesquisa, por considerar todos os tipos de gestos em um único modelo, com a diferença de abranger mais gestos que as referências encontradas na literatura, como os movimentos de braços. 
+
+No caso, o modelo em questão foi treinado com 15 classes, sendo:
+
+1. Movimento_01: Pegar álcool com a mão esquerda
+2. Movimento_02: Higienizar as unhas da mão direita
+3. Movimento_03a: Higienizar o braço direito (até a altura do cotovelo)
+4. Movimento_04: Pegar álcool com a mão direita
+5. Movimento_05: Higienizar as unhas da mão esquerda
+6. Movimento_06: Higienizar o braço esquerdo (até a altura do cotovelo)
+7. Movimento_07a: Higienizar as Palmas das mãos
+8. Movimento_08a: Higienizar o dorso da mão esquerda
+9. Movimento_08b: Higienizar o dorso da mão direita
+10. Movimento_09: Higienização interdigital
+11. Movimento_10a: Higienizar dedos da mão esquerda
+12. Movimento_10b: Higienizar dedos da mão direita
+13. Movimento_11a: Higienizar polegar da mão esquerda
+14. Movimento_11b: Higienizar polegar da mão direita
+15. Movimento_12: Movimento de reinicialização do sistema 
+    
+Para o treinamento do modelo, as imagens de cada um dos 15 gestos foram cortadas (*crop*) em um formato quadrado, com dimensão de 500x500 pixels, denominada CROP_GRANDE, por ser equivalente a uma região delimitada para captura de movimentos de braços durante a coleta de dados, a qual é maior que a região delimitada para captura de movimentos de mãos, denominada CROP_PEQUENO (que, por sua vez, possui dimensão de 200x200 pixels).
+
+Os resultados do modelo de classificação foram avaliados utilizando diversas métricas de desempenho. A acurácia do modelo foi de 97%, indicando que 97% das previsões feitas pelo modelo estavam corretas. A precisão, que mede a proporção de verdadeiros positivos entre as previsões positivas, foi de 97%, enquanto a revocação (ou sensibilidade), que mede a proporção de verdadeiros positivos entre os casos reais positivos (relevantes), também foi de 97%. O F1-score, que é a média harmônica entre precisão e revocação, foi, portanto, de 97%, refletindo um equilíbrio entre essas duas métricas. As métricas gerais e detalhadas para cada classe podem ser vistas na Figura 1. A matriz de confusão, que pode ser vista na Figura 2, revelou a distribuição das previsões para cada uma das classes, fornecendo uma visão detalhada dos erros do modelo. No geral, o modelo apresentou um bom desempenho com altas taxas de acurácia, precisão, revocação e f1-score, embora haja espaço para melhorias, conforme indicado pela matriz de confusão.
+
+<br />
+<div class='img_center'>
+    ![Métricas detalhadas para o modelo de 15 classes](/modelosAM/ClassificationReport_ModeloCompleto.png "Métricas detalhadas para o modelo de 15 classes")
+</div>
+<br />
+
+<br />
+<div class='img_center_60'>
+    ![Matriz de confusão para o modelo de 15 classes](/modelosAM/confusion_matrix_modeloCompleto.png "Matriz de confusão para o modelo de 15 classes")
+</div>
+<br />

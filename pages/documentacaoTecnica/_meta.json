@@ -1,0 +1,11 @@
+{
+    "documentacao": "Documentação",
+    "agrupamentoRequisitos":"Agrupamento de Requisitos",
+    "casoDeUso":"Caso de Uso",
+    "arquiteturaProjeto":"Arquitetura do Projeto",
+    "arquiteturaDeSoftware":"Arquitetura de Software",
+    "arquiteturaRecomendada":{
+        "display":"hidden"
+    }
+
+}

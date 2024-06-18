@@ -1,0 +1,38 @@
+---
+title: Agrupamento de requisitos
+---
+
+# Agrupamento de requisitos
+
+<p style={{textAlign: 'justify', textIndent: '20px', marginBottom: '5px'}}> Os requisitos do sistema são especificações que descrevem o que o sistema deve fazer, como ele deve se comportar e quais são as suas limitações. Esses requisitos podem ser funcionais, descrevendo o que o sistema deve fazer, ou não funcionais, estabelecendo restrições e limitações. As Tabelas <a href="#tab-req1">1</a> e <a href="#tab-req2">2</a> apresentam, respectivamente, os requisitos funcionais e não funcionais do sistema LavAI.</p>
+
+<center id="tab-req1"><strong>Tabela 1.</strong> Descrição dos requisitos funcionais.</center>
+
+| Identificador | Descrição | Classificação | Prioridade |
+|--- |--- |--- |--- |
+| RF001 | O Sistema deve permitir a interação sem a necessidade de mouse ou teclados | Usabilidade | Essencial |
+| RF002 | O sistema deve inicializar ao ligar a maquina (hardware) sem necessidade de interveção manual | Usabilidade | Desejável |
+| RF003 | O sistema deve temporizar cada passo da lavagem de mãos de acordo com os parametros e diretrizes da OMS / Anvisa / ou Orgão regulador. | Implementação | Essencial |
+| RF004 | O sistema deve mostrar em qual etapa está o processo de lavagem atráves de referencia visual dos passos | Usabilidade | Importante |
+| RF005 | O sistema deve identificar em qual mão foi coletado o alcool e de acordo com a coleta inicializar o processo nos passos corretos referente a mão  | Implementação | Essencial |
+| RF006 | O sistema deve ter um  label indentificando a mão e mostrando a lavagem para visual do usuario com uma camera especifica para o processo. | Usabilidade | Importante |
+| RF007 | O sistema deve verificar o passo executado e indetificar se está corretamente sendo executado podendo para o cronometro ao não executado corretamente de acordo com as normas e processedimentos de lavagem. | Implementação | Essencial |
+| RF008 | O sistema ao finalizar a lavagem corretamente deve emitir uma mensagem de alerta indicando a finalização dos passos | Usabilidade | Essencial |
+| RF009 | O sistema ao finalizar deve reiniciar automaticamente para o proximo usuairo começar o mesmo sem a necessidade de intervenção manual | Implementação | Essencial |
+
+
+<br/>
+
+<center id="tab-req2"><strong>Tabela 2.</strong> Descrição dos requisitos não funcionais.</center>
+
+| Identificador | Descrição | Classificação |
+|--- |--- |--- |
+| RNF001 | O sistema deve ser construido em Python e ser desenvolvido para versão desktop. | Implementação |
+| RNF002 | O sistema não deverar salvar informações do utilizador bem como não possuir banco de dados. | Implementação |
+| RNF003 | O sistema deverar ser construido utilizando o paradigma de programação orientada a protocolo .  | Implementação |
+| RNF004 | O sistema será utilizado apenas por uma pessoa por vez. | Implementação |
+| RNF005 | O sistema deverar inicializar ao ligar a maquina e reiniciar automaticamente quando não utilizado| Implementação |
+| RNF006 | O termos de uso estarão alinhados com a LGPD (lei geral de proteção aos dados). | Segurança |
+| RNF007 | O sistema deverar reinicializa o processo de thread ao não utilizar depois de determinado tempo em standby para não consumo excessivo de recursos da maquina. | Implementação |
+| RNF008 | O usuário terá acesso aos termos de uso após realizar o login e na tela home do aplicativo.  | Implementação |
+| RNF009 | O modelo de inteligência artificial classificador  deverá ser implementado utilizando a linguagem de programação Python, com a biblioteca TensorFlow. | Implementação |

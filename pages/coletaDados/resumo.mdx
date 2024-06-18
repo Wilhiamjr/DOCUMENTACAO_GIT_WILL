@@ -1,0 +1,44 @@
+import Image from 'next/image'
+
+
+# Armazenamento
+
+As pastas nas quais todos os dados foram armazenados tinham uma estrutura aninhada conforme a seguir:
+
+Dias (17 em total) -> Pessoas (5 por dia) -> Movimentos (18 por pessoa) -> Imagens (200 por movimento)  
+
+
+Para facilitar o acesso e a transparência da estrutura as pastas foram nomeadas utilizando um sublinhado (underscore) seguido de uma notação numérica (*XX*), tal como:
+
+<br/>
+- [x] Cada pasta *Dia_XX* continha 5 pastas chamadas *Pessoa_XX*
+- [x] Cada pasta *Pessoa_XX* continha 18 pastas chamadas *Movimento_XX*
+- [x] Cada pasta *Movimento_XX* continha aproximadamente 200 imagens RGB e profundidade
+
+A mesma estrutura de pastas foi sincronizada em tempo real com o armazenamento em nuvem (*pCloud*) que pôde ser rapidamente acessado e processado pela equipe de ciência de dados fora de Goiânia.
+
+
+Dia             |  Pessoa |
+:-------------------------:|:-------------------------:|
+<Image src="/coletaDados/pcloud_1.png" alt="Formulario 1" width={500} height={500} />  |  <Image src="/coletaDados/pcloud_2.png" alt="Formulario 1" width={500} height={500} /> 
+
+<br/>
+
+Movimento | Imagens 
+:-------------------------:|:-------------------------:
+  <Image src="/coletaDados/pcloud_3.png" alt="Formulario 1" width={500} height={500} /> |  <Image src="/coletaDados/pcloud_4.png" alt="Formulario 1" width={500} height={500} />
+
+<br/>
+# Resumo da coleta
+A tabela a seguir resume o volume dos dados coletados:
+
+
+| Total  Variaveis      | Valores | 
+| :------------         | :---------:   |
+| Pessoas         |    74         | 
+| Movimentos      |    1330       |   
+| Imagens         |    400000     |   
+| Horas gravadas  |    7.5        |   
+| Imagens por classe    |    12000      |   
+
+

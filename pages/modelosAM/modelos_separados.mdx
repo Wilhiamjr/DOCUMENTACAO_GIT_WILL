@@ -1,0 +1,93 @@
+---
+title: Abordagem de modelos separados
+---
+
+# Modelos separados para tipos de gestos diferentes
+
+A abordagem de modelos separados engloba 3 modelos diferentes, integrados em um software final, para a tarefa de reconhecimento dos movimentos de higienização de mãos. Essa abordagem foi motivada para permitir um foco maior em características particulares de gestos que envolvem regiões de interesse diferentes. Os 3 modelos treinados (modelo de mãos, de braços e de álcool) serão apresentados em detalhes.
+
+## Modelo de Mãos
+
+O modelo em questão foi treinado com 12 classes, sendo:
+
+1. Movimento_02: Higienizar as unhas da mão direita
+2. Movimento_05: Higienizar as unhas da mão esquerda
+3. Movimento_07a: Higienizar as Palmas das mãos
+4. Movimento_08a: Higienizar o dorso da mão esquerda
+5. Movimento_08b: Higienizar o dorso da mão direita
+6. Movimento_09: Higienização interdigital
+7. Movimento_10a: Higienizar dedos da mão esquerda
+8. Movimento_10b: Higienizar dedos da mão direita
+9. Movimento_11a: Higienizar polegar da mão esquerda
+10. Movimento_11b: Higienizar polegar da mão direita
+11. Movimento_12: Movimento de reinicialização do sistema
+12. Outros: Outros movimentos não interessantes para o modelo (incluindo movimentos de braços e de pegar álcool)
+    
+Para o treinamento do modelo, as imagens de cada um dos 12 gestos foram cortadas (*crop*) em um formato quadrado, com dimensão de 200x200 pixels, denominada CROP_PEQUENO, por ser equivalente a uma região delimitada para captura de movimentos de mãos durante a coleta de dados.
+
+Os resultados do modelo de classificação foram avaliados utilizando diversas métricas de desempenho. A acurácia do modelo foi de 98%, indicando que 98% das previsões feitas pelo modelo estavam corretas. A precisão, que mede a proporção de verdadeiros positivos entre as previsões positivas, foi de 98%, enquanto a revocação (ou sensibilidade), que mede a proporção de verdadeiros positivos entre os casos reais positivos (relevantes), também foi de 98%. O F1-score, que é a média harmônica entre precisão e revocação, foi, portanto, de 98%, refletindo um equilíbrio entre essas duas métricas. As métricas gerais e detalhadas para cada classe podem ser vistas na Figura 1. A matriz de confusão, que pode ser vista na Figura 2, revelou a distribuição das previsões para cada uma das classes, fornecendo uma visão detalhada dos erros do modelo. No geral, o modelo apresentou um bom desempenho com altas taxas de acurácia, precisão, revocação e f1-score, embora haja espaço para melhorias, conforme indicado pela matriz de confusão.
+
+<br />
+<div class='img_center'>
+    ![Figura 1: Métricas detalhadas para o modelo de mãos](/modelosAM/ClassificationReport_ModelHands.png "Métricas detalhadas para o modelo de mãos")
+</div>
+<br />
+
+<br />
+<div class='img_center_60'>
+    ![Figura 2: Matriz de confusão para o modelo de mãos](/modelosAM/confusion_matrix_modelHands.png "Matriz de confusão para o modelo de mãos")
+</div>
+<br />
+
+
+## Modelo de Braços
+
+O modelo em questão foi treinado com 4 classes, sendo:
+
+1. Movimento_03a: Higienizar o braço direito (até a altura do cotovelo)
+2. Movimento_06: Higienizar o braço esquerdo (até a altura do cotovelo)
+3. Movimento_12: Movimento de reinicialização do sistema 
+4. Outros: Outros movimentos não interessantes para o modelo (incluindo movimentos de braços e de pegar álcool)
+    
+Para o treinamento do modelo, as imagens de cada um dos 4 gestos foram cortadas (*crop*) em um formato quadrado, com dimensão de 500x500 pixels, denominada CROP_GRANDE, por ser equivalente a uma região delimitada para captura de movimentos de braços durante a coleta de dados, a qual é maior que a região delimitada para captura de movimentos de mãos, denominada CROP_PEQUENO (que, por sua vez, possui dimensão de 200x200 pixels).
+
+Os resultados do modelo de classificação foram avaliados utilizando diversas métricas de desempenho. A acurácia do modelo foi de 99%, indicando que 99% das previsões feitas pelo modelo estavam corretas. A precisão, que mede a proporção de verdadeiros positivos entre as previsões positivas, foi de 99%, enquanto a revocação (ou sensibilidade), que mede a proporção de verdadeiros positivos entre os casos reais positivos (relevantes), também foi de 99%. O F1-score, que é a média harmônica entre precisão e revocação, foi, portanto de 99%, refletindo um equilíbrio entre essas duas métricas. As métricas gerais e detalhadas para cada classe podem ser vistas na Figura 3. A matriz de confusão, que pode ser vista na Figura 4, revelou a distribuição das previsões para cada uma das classes, fornecendo uma visão detalhada dos erros do modelo. No geral, o modelo apresentou um bom desempenho com altas taxas de acurácia, precisão, revocação e f1-score, embora haja espaço para melhorias, conforme indicado pela matriz de confusão.
+
+<br />
+<div class='img_center'>
+    ![Figura 3: Métricas detalhadas para o modelo de braços](/modelosAM/ClassificationReport_ModelArms.png "Métricas detalhadas para o modelo de braços")
+</div>
+<br />
+
+<br />
+<div class='img_center_60'>
+    ![Figura 4: Matriz de confusão para o modelo de braços](/modelosAM/confusion_matrix_modelArms.png "Matriz de confusão para o modelo de braços")
+</div>
+<br />
+
+## Modelo de Álcool
+
+Foram realizados experimentos considerando o treinamento com 4, 3 e 2 classes, sendo elas as 4 classes abaixo, ou, respectivamente, apenas as classes apresentadas nos itens 1, 2 e 4 ou apenas as classes apresentadas nos itens 1 e 2:
+
+1. Movimento_01: Pegar álcool com a mão esquerda
+2. Movimento_04: Pegar álcool com a mão direita
+3. Movimento_12: Movimento de reinicialização do sistema 
+4. Outros: Outros movimentos não interessantes para o modelo (incluindo movimentos de braços e de pegar álcool)
+
+A solução final (conforme detalhes apresentados na próxima Seção) utiliza o modelo de 2 classes (itens 1 e 2 apresentados acima).
+    
+Para o treinamento dos modelos de álcool, as imagens de cada um dos 4 gestos foram cortadas (*crop*) em um formato quadrado, em um formato quadrado, com dimensão de 200x200 pixels, denominada CROP_PEQUENO, por ser equivalente a uma região delimitada para captura de movimentos de mãos durante a coleta de dados. Foram realizados também treinamentos de cada um dos modelos (4, 3 e 2 classes) com o CROP_GRANDE (apresentado anteriormente), mas a solução final (apresentada na próxima Seção) utilizou o modelo de CROP_PEQUENO.
+
+Os resultados do modelo de classificação foram avaliados utilizando diversas métricas de desempenho. A acurácia do modelo foi de 100%, indicando que 100% das previsões feitas pelo modelo estavam corretas. A precisão, que mede a proporção de verdadeiros positivos entre as previsões positivas, foi de 100%, enquanto a revocação (ou sensibilidade), que mede a proporção de verdadeiros positivos entre os casos reais positivos (relevantes), também foi de 100%. O F1-score, que é a média harmônica entre precisão e revocação, foi, portanto, de 100%, refletindo um equilíbrio entre essas duas métricas. As métricas gerais e detalhadas para cada classe podem ser vistas na Figura 5. A matriz de confusão, que pode ser vista na Figura 6, revelou a distribuição das previsões para cada uma das classes, fornecendo uma visão detalhada dos erros do modelo. No geral, o modelo apresentou um bom desempenho com altas taxas de acurácia, precisão, revocação e f1-score, embora haja espaço para melhorias, conforme indicado pela matriz de confusão.
+
+<br />
+<div class='img_center'>
+    ![Figura 5: Métricas detalhadas para o modelo de álcool](/modelosAM/ClassificationReport_ModelAlcohol_2classes.png "Métricas detalhadas para o modelo de álcool")
+</div>
+<br />
+
+<br />
+<div class='img_center_60'>
+    ![Figura 6: Matriz de confusão para o modelo de álcool](/modelosAM/confusion_matrix_modelAlcohol_2classes.png "Matriz de confusão para o modelo de álcool")
+</div>
+<br />

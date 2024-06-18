@@ -1,0 +1,66 @@
+---
+title: Sistema de identificação de mão pegando álcool
+---
+
+# Sistema de identificação de mão pegando álcool
+
+O reconhecimento do movimento de pegar álcool se revelou um tanto mais desafiador que os demais movimentos,
+
+O gesto de pegar álcool é elemento obrigatório do procedimento de antissepsia das mãos e deve ser registrado. Ele aparece três vezes na interface, todavia, classificá-lo apenas com métodos de Aprendizado de Máquina se tornou bastante desafiador. Esse reconhecimento requer, além da identificação do movimento em si, também a identificação posicionamento correto em relação ao dispensador de álcool, que pode variar bastante em tamanho, formato e posicionamento, pois não temos controle de onde o dispensador de álcool está instalado. 
+
+Para tanto, foram exploradas diversas opções para esse processo de identificação de mão pegando álcool.
+
+## Configuração de Dispenser
+
+Na configuração do sistema, antes de iniciar a tela principal do software, é apresentado a um usuário técnico uma interface para configuração do dispensador de álcool gel. Essa interface exibe uma imagem capturada do ambiente, permitindo que o usuário selecione a região de interesse (ROI - Region of Interest) com o auxílio do mouse. Após definir a ROI, o usuário pode pressionar as teclas Enter e Esc do teclado para salvar as configurações. Essas configurações serão armazenadas para consulta posterior, garantindo que o software funcione conforme as especificações definidas durante o seu uso.
+
+<br />
+<div class='img_center'>
+    ![Figura 1: Configuração do dispensador de álcool](/modelosAM/ConfiguracaoDispenser3.png "Configuração do dispensador de álcool")
+</div>
+<br />
+
+## Mudança de Pixels na região do dispenser
+
+Em um primeiro momento, foi adotada uma solução de registrar o movimento de consumo de álcool pelo método de análise de imagem, pela variação dos pixels da imagem em regiões de interesse (ROIs). Este método apresenta a inconveniência de demandar que um indivíduo efetue a calibração das posições dos dispensadores, entretanto, possui a grande vantagem de dispensar a necessidade de treinamento com uma grande variedade de posições dos dispensadores.  
+
+A solução foi implementada e uma imagem correspondente pode ser vista na Figura 2. Conforme ilustrado na Figura, delimita-se uma área mediante um retângulo azul, indicativa de um dispensador, enquanto zonas circundantes de interesse são representadas por retângulos vermelhos. A área demarcada pelos retângulos vermelhos nas proximidades do dispensador representa a região onde se identificam movimentos próximos ao dispositivo.
+
+Essa abordagem, todavia, se revelou dependente da quantidade de luz e não específica para o reconhecimento de mãos na região do dispenser. Portanto, acabou sendo substituída.
+
+<br />
+<div class='img_center'>
+    ![Figura 2: Mudança de Pixels na região do dispensador de álcool](/modelosAM/MudancaPixelsROI.png "Mudança de Pixels na região do dispensador de álcool")
+</div>
+<br />
+
+## MediaPipe
+
+MediaPipe consiste em um conjunto de bibliotecas de código aberto desenvolvidos pelo Google para facilitar a construção de pipelines de processamento de mídia, como vídeo, áudio e dados de sensores [^1]. Utilizando um framework flexível e modular, MediaPipe permite a implementação de soluções avançadas de aprendizado de máquina para reconhecimento de gestos, rastreamento de mãos, detecção de rostos, segmentação de objetos e muitas outras aplicações em tempo real [^2]. 
+
+[^1]: https://ai.google.dev/edge/mediapipe/solutions/guide?hl=pt-br
+[^2]: https://github.com/google-ai-edge/mediapipe 
+
+Durante o desenvolvimento do software, foi implementada também uma solução que fazia uso do MediaPipe para reconhecer o momento em que os dedos de cada uma das mãos (esquerda ou direita) tocavam a região do dispenser. Todavia, esta solução também se revelou dependente da quantidade de luz e com certa frequência falhava na identificação de qual mão estava realizando o movimento. Portanto, também foi substituída.
+
+## Centro de Massa
+
+Uma terceira alternativa implementada usava o conceito de centros de massa. Nas Figuras 3 e 4 (abaixo), à esquerda há uma imagem de profundidade com longas caixas horizontais. Essas caixas ficam “vazias” quando não há objeto dentro delas. Se uma mão aparecer na caixa, um centro de massa da distribuição de pixels poderá ser calculado. Para cada uma das quatro caixas esse centro de massa pode ser calculado e visualizado usando pequenos círculos. A distribuição desses círculos em todas as quatro caixas é geralmente única para a mão esquerda ou direita esticada na tela. Implementando no código tais condições, uma mão pode ser identificada conforme mostrado na imagem à direita de cada uma das Figuras. 
+
+![Figura 3: Centro de Massa para mão esquerda](/modelosAM/CM_left.png "Centro de Massa para mão esquerda")
+
+![Figura 4: Centro de Massa para mão direita](/modelosAM/CM_right.png "Centro de Massa para mão direita")
+
+## Utilização apenas de modelos treinados com as imagens coletadas
+
+Desde o início do projeto previu-se que modelos de aprendizado de máquina sozinhos poderiam não ser suficientes para a tarefa de identificação de mão pegando álcool. Todavia, essa abordagem também precisava ser testada. Assim, conforme mencionado na Seção anterior, foram treinados diversos modelos para para a tarefa, tanto considerando a imagem completa do ambiente, como considerando regiões de interesse (ROIs) mais específicas. Conforme previsto, os modelos isolados não foram suficientes para cumprir a tarefa, contudo, demonstraram ser excelentes aliados quando integrados em abordagens que consideram múltiplos aspectos e combinam diversas técnicas, como na solução final apresentada a seguir. 
+
+## Solução Final
+
+A solução final aborda as seguintes características:
+
+    1: Conforme mencionado anteriormente, ao usar o sistema pela primeira vez, o usuário deverá selecionar a área relativa ao dispensador de álcool. Uma vez selecionada, esta área será salva e usada como referência.
+
+    2: Durante o funcionamento do sistema, uma região ao redor da área do dispensador será criada automaticamente, e, nos momentos em que o usuário deverá pegar álcool (passos 1, 4, 7), o sistema verificará se a mão passou por essa região, que servirá como confirmação de álcool foi pego. 
+    
+    3: Os passos 1 e 4 devem ser realizados por mãos opostas, por exemplo, se no passo 1 o usuário pegou álcool com a mão esquerda, no passo 4, o mesmo deverá ser feito com a mão direita, ou vice-versa. O passo 7 permite que qualquer uma das mãos seja utilizada. Para identificar qual mão está pegando o álcool (direita ou esquerda), é então utilizado o modelo de álcool apresentado na Seção Anterior, considerando apenas a região da imagem ao redor do dispensador.

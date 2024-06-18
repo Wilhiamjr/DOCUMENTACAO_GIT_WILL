@@ -1,0 +1,11 @@
+{ 
+  "index": "Introdução" ,
+  "estudoEstadoArte": "Estudo Clínico e Estado da Arte",
+  "escolhaHardware":"Escolha de Hardware",
+  "coletaDados":"Coleta de dados",
+  "modelosAM":"Modelos de ML",
+  "documentacaoTecnica":"Documentação Tecnica",
+  "manualUsuario":{
+    "title":"Manual de Usuário"
+  }
+}
